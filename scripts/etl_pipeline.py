@@ -69,7 +69,10 @@ def process_and_load_csvs():
     
     for file in csv_files:
         file_name = os.path.basename(file)
+        # Strip leading numbers and underscores for cleaner table names (e.g. 01_fund_master -> fund_master)
         table_name = os.path.splitext(file_name)[0]
+        import re
+        table_name = re.sub(r'^\d+_', '', table_name)
         try:
             df = pd.read_csv(file)
             logging.info(f"\n{'='*40}\nDataset: {file_name}\n{'='*40}")
