@@ -189,7 +189,7 @@ def load_to_sqlite():
         other_dfs['aum_by_fund_house'].to_sql('fact_aum', engine, if_exists='append', index=False)
         logging.info("Loaded fact_aum")
         
-    engine.close()
+    engine.dispose()
 
 if __name__ == '__main__':
     load_to_sqlite()
