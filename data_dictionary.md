@@ -68,3 +68,7 @@ Monthly aggregated AUM tracking per Fund House.
 - **aum_lakh_crore** (REAL): AUM in Lakh Crores.
 - **aum_crore** (REAL): AUM converted to Crores.
 - **num_schemes** (INTEGER): Active scheme count.
+
+## Summary Statistics
+
+
