@@ -99,6 +99,11 @@ def clean_investor_transactions():
     
     # Check KYC
     df['kyc_status'] = df['kyc_status'].str.upper()
+    valid_kyc = ['VERIFIED', 'PENDING', 'REJECTED']
+    invalid_kyc = df[~df['kyc_status'].isin(valid_kyc)]
+    if not invalid_kyc.empty:
+        logging.warning(f"Found {len(invalid_kyc)} invalid KYC statuses. Setting to UNKNOWN.")
+        df.loc[~df['kyc_status'].isin(valid_kyc), 'kyc_status'] = 'UNKNOWN'
     
     out_path = PROCESSED_DIR / 'investor_transactions.csv'
     df.to_csv(out_path, index=False)
@@ -117,6 +122,10 @@ def clean_scheme_performance():
     return_cols = ['return_1yr_pct', 'return_3yr_pct', 'return_5yr_pct', 'benchmark_3yr_pct']
     for col in return_cols:
         df[col] = pd.to_numeric(df[col], errors='coerce')
+        # Flag anomalies (e.g., NaN values or extreme returns > 1000%)
+        anomalies = df[df[col].isna() | (df[col] > 1000) | (df[col] < -100)]
+        if not anomalies.empty:
+            logging.warning(f"Found {len(anomalies)} anomalies in {col}. Flagging for review.")
         
     # Check expense ratio range
     invalid_expense = df[(df['expense_ratio_pct'] < 0.1) | (df['expense_ratio_pct'] > 2.5)]
@@ -189,6 +198,16 @@ def load_to_sqlite():
         other_dfs['aum_by_fund_house'].to_sql('fact_aum', engine, if_exists='append', index=False)
         logging.info("Loaded fact_aum")
         
+    # Verify row counts match CSV
+    with engine.connect() as conn:
+        for table, df in [('fact_nav', nav_df), ('fact_transactions', txn_df), ('fact_performance', perf_df)]:
+            if df is not None:
+                count = conn.execute(text(f"SELECT COUNT(*) FROM {table}")).scalar()
+                if count == len(df):
+                    logging.info(f"Row count verified for {table}: {count}")
+                else:
+                    logging.error(f"Row count mismatch for {table}: DB={count}, CSV={len(df)}")
+                    
     engine.dispose()
 
 if __name__ == '__main__':

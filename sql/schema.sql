@@ -97,3 +97,10 @@ CREATE TABLE IF NOT EXISTS fact_aum (
     PRIMARY KEY (date, fund_house),
     FOREIGN KEY (date) REFERENCES dim_date(date)
 );
+
+-- Indexes for Performance
+CREATE INDEX IF NOT EXISTS idx_fact_txn_amfi ON fact_transactions(amfi_code);
+CREATE INDEX IF NOT EXISTS idx_fact_txn_date ON fact_transactions(transaction_date);
+CREATE INDEX IF NOT EXISTS idx_fact_nav_amfi ON fact_nav(amfi_code);
+CREATE INDEX IF NOT EXISTS idx_fact_aum_date ON fact_aum(date);
+CREATE INDEX IF NOT EXISTS idx_dim_fund_cat ON dim_fund(category);
