@@ -1,10 +1,16 @@
+"""
+Module: run_analytics.py
+Description: Computes financial analytics and scores mutual funds, replacing prints with logging.
+"""
 import pandas as pd
 import numpy as np
 import scipy.stats as stats
 import matplotlib.pyplot as plt
 import seaborn as sns
 import warnings
+import logging
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 warnings.filterwarnings('ignore')
 sns.set_theme(style="whitegrid")
 
@@ -41,6 +47,7 @@ start_3y = end_date - pd.DateOffset(years=3)
 start_5y = end_date - pd.DateOffset(years=5)
 
 def calculate_cagr(start_val, end_val, years):
+    """Calculate Compound Annual Growth Rate (CAGR)."""
     if start_val > 0 and years > 0:
         return (end_val / start_val) ** (1 / years) - 1
     return np.nan
@@ -154,6 +161,7 @@ rank_expense = valid_funds['expense_ratio_pct'].rank(ascending=False)
 rank_dd = valid_funds['Max_Drawdown'].rank(ascending=True)
 
 def normalize_rank(series):
+    """Normalize a series of ranks to a 0-100 scale."""
     return (series - 1) / (len(series) - 1) * 100
 
 valid_funds['Score_3Y'] = normalize_rank(rank_3yr) * 0.30
@@ -204,12 +212,12 @@ for _, row in top_5.iterrows():
         al_50 = pd.concat([f_ret, n50_ret], axis=1).dropna()
         if len(al_50) > 0:
             te_50 = (al_50.iloc[:, 0] - al_50.iloc[:, 1]).std() * np.sqrt(252)
-            print(f"Tracking Error ({name} vs NIFTY 50): {te_50:.4f}")
+            logging.info(f"Tracking Error ({name} vs NIFTY 50): {te_50:.4f}")
             
         al_100 = pd.concat([f_ret, n100_ret], axis=1).dropna()
         if len(al_100) > 0:
             te_100 = (al_100.iloc[:, 0] - al_100.iloc[:, 1]).std() * np.sqrt(252)
-            print(f"Tracking Error ({name} vs NIFTY 100): {te_100:.4f}")
+            logging.info(f"Tracking Error ({name} vs NIFTY 100): {te_100:.4f}")
 
 plt.title('Top 5 Funds vs Benchmarks (3 Years)', fontsize=16)
 plt.xlabel('Date', fontsize=12)

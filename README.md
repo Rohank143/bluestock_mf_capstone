@@ -1,110 +1,58 @@
-# Bluestock Fintech — Mutual Fund Analytics Capstone
+# Bluestock Mutual Fund Capstone Project
 
-End-to-End Data Engineering, ETL Pipeline & Interactive Dashboard
-**Duration:** 7 Working Days | ~50–55 Hours
-**Data:** 40 schemes, 87K+ rows, 4.5 years of NAV history
+## Project Overview
+This repository contains the full end-to-end data engineering and analytics capstone project for Bluestock Mutual Funds. The primary objective is to ingest, standardize, and analyze a fragmented dataset encompassing 40 schemes.
 
----
+### Key Features
+1. **Automated ETL Pipeline**: Extracts data from static CSV dumps and live NAV prices from the AMFI API, transforms them into a cleaned state, and loads them into a Star Schema SQLite data warehouse.
+2. **Exploratory Data Analysis (EDA)**: Comprehensive jupyter notebooks revealing trends like the 2023 Bull Run, SIP inflow growth, and demographic investment behaviors.
+3. **Advanced Performance Analytics**: Computes critical financial metrics including 1Y/3Y/5Y CAGR, Sharpe Ratio, Alpha, Beta, Tracking Error, and Maximum Drawdown.
+4. **Fund Recommender**: A CLI rule-based recommendation engine matching investor risk profiles to the top performing funds.
+5. **Reporting**: Includes a robust 15-20 page PDF report and a 12-slide Executive Presentation highlighting the insights and architectural design.
 
-## Project Structure
+## Setup Instructions
 
-```
-bluestock_mf_capstone/
-├── data/
-│   ├── raw/           ← Original CSVs + mfapi.in downloads
-│   ├── processed/     ← Cleaned, merged datasets
-│   └── db/            ← bluestock_mf.db (SQLite) — gitignored
-├── notebooks/
-│   ├── 01_data_ingestion.ipynb
-│   ├── 02_data_cleaning.ipynb
-│   ├── 03_eda_analysis.ipynb
-│   ├── 04_performance_analytics.ipynb
-│   └── 05_advanced_analytics.ipynb
-├── scripts/
-│   ├── data_ingestion.py   ← Load + validate all 10 CSVs
-│   ├── live_nav_fetch.py   ← Fetch live NAV from mfapi.in
-│   ├── etl_pipeline.py     ← Master ETL (clean + load to DB)
-│   ├── compute_metrics.py  ← Sharpe, Alpha, Beta, etc.
-│   └── recommender.py      ← Fund recommendation by risk grade
-├── sql/
-│   ├── schema.sql          ← CREATE TABLE statements
-│   └── queries.sql         ← 10 analytical SQL queries
-├── dashboard/
-│   └── bluestock_mf.pbix   ← Power BI dashboard
-├── reports/
-│   ├── Final_Report.pdf
-│   └── Presentation.pptx
-├── requirements.txt
-└── README.md
-```
+### Prerequisites
+- Python 3.9+
+- Pip package manager
 
----
+### Installation
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/bluestock-mf-capstone.git
+   cd bluestock-mf-capstone
+   ```
+2. Install the required dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-## Quick Start
+## How to Run the Pipeline
+We have condensed the entire data processing, analysis, and report generation sequence into a single master script.
 
-### 1. Install dependencies
+To run the full pipeline:
 ```bash
-pip install -r requirements.txt
+python run_pipeline.py
 ```
+This will sequentially execute:
+1. ETL & Data Cleaning
+2. Financial Analytics & Scoring
+3. EDA Notebook Generation
+4. PDF Report and Presentation Generation
 
-### 2. Place datasets in `data/raw/`
-Required files:
-- `01_fund_master.csv`
-- `02_nav_history.csv`
-- `03_aum_by_fund_house.csv`
-- `04_monthly_sip_inflows.csv`
-- `05_category_inflows.csv`
-- `06_industry_folio_count.csv`
-- `07_scheme_performance.csv`
-- `08_investor_transactions.csv`
-- `09_portfolio_holdings.csv`
-- `10_benchmark_indices.csv`
+## How to Open the Dashboard
+The executive dashboard provides an interactive deep-dive into the fund performance.
+1. Navigate to the `dashboard/` directory.
+2. Open the `Bluestock_Dashboard.twbx` (Tableau) or `.pbix` (Power BI) file using the respective desktop application.
+3. **Published Version**: The dashboard can also be viewed online at: 
+   > [Published Dashboard Placeholder URL - User to update]
 
-### 3. Run Day 1 scripts
-```bash
-python scripts/data_ingestion.py     # Load + validate all 10 CSVs
-python scripts/live_nav_fetch.py     # Fetch live NAV from mfapi.in
-```
-
-### 4. Run full ETL pipeline (Day 2+)
-```bash
-python scripts/etl_pipeline.py
-```
-
----
-
-## Data Sources
-
-| Source | URL | Data |
-|--------|-----|------|
-| AMFI India | amfiindia.com | NAV, AUM, SIP data |
-| mfapi.in | api.mfapi.in/mf/{code} | Historical NAV (JSON) |
-| NSE India | nseindia.com | Nifty 50, Nifty 100 index |
-| BSE India | bseindia.com | BSE SmallCap index |
-
----
-
-## Key Metrics Computed
-- **CAGR** (1yr, 3yr, 5yr)
-- **Sharpe Ratio** (Rf = 6.5%, annualised with √252)
-- **Sortino Ratio** (downside deviation only)
-- **Alpha & Beta** (OLS vs Nifty 100)
-- **Max Drawdown**
-- **VaR & CVaR** (95% confidence, historical method)
-- **Fund Composite Scorecard** (weighted rank model)
-
----
-
-## Dashboard Pages (Power BI)
-1. **Industry Overview** — Total AUM, SIP inflows, folio count
-2. **Fund Performance** — Risk-return scatter, NAV vs benchmark
-3. **Investor Analytics** — Demographics, geography, SIP vs lumpsum
-4. **SIP & Market Trends** — SIP inflow vs Nifty, category heatmap
-
----
-
-## Notes
-- `*.db` files are gitignored. To recreate the database: `python scripts/etl_pipeline.py`
-- All NAV values are anchored to real AMFI values from mfapi.in
-- Investor transaction data is synthetically generated with real geographic distributions
-- This project is for **educational purposes only** and does not constitute financial advice
+## Dataset Descriptions
+The data is structured into raw, processed, and database layers:
+- `dim_fund_master`: Reference dimensions for the 40 mutual fund schemes (Category, AMC, Expense Ratio).
+- `dim_date`: Calendar dimension table.
+- `fact_nav_history`: Daily Net Asset Value time-series data.
+- `fact_aum`: Assets Under Management metrics.
+- `fact_transactions`: Granular investor transactions (SIPs/Lumpsums).
+- `portfolio_holdings`: Sector and asset allocation details.
+- `monthly_sip_inflows`: Aggregate system-level inflows.

@@ -7,3 +7,5 @@ sqlalchemy
 requests
 scipy
 jupyter
+fpdf2
+python-pptx

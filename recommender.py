@@ -1,7 +1,15 @@
+"""
+Module: recommender.py
+Description: A simple rule-based mutual fund recommender based on risk appetite.
+"""
 import pandas as pd
 import os
+import logging
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def recommend_funds(risk_appetite):
+    """Recommend top 3 funds based on the user's risk appetite."""
     # Mapping risk appetite to fund risk_grade
     risk_mapping = {
         'Low': ['Low', 'Moderately Low'],
@@ -13,7 +21,7 @@ def recommend_funds(risk_appetite):
     risk_appetite = risk_appetite.capitalize()
     
     if risk_appetite not in risk_mapping:
-        print("Invalid risk appetite. Please enter 'Low', 'Moderate', or 'High'.")
+        logging.warning("Invalid risk appetite. Please enter 'Low', 'Moderate', or 'High'.")
         return
         
     target_categories = risk_mapping[risk_appetite]
@@ -21,7 +29,7 @@ def recommend_funds(risk_appetite):
     # Load data
     data_path = os.path.join(os.path.dirname(__file__), 'recommender_data.csv')
     if not os.path.exists(data_path):
-        print("Error: recommender_data.csv not found. Please run advanced_analytics_generator.py first.")
+        logging.error("recommender_data.csv not found. Please run advanced_analytics_generator.py first.")
         return
         
     df = pd.read_csv(data_path)
