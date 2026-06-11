@@ -56,3 +56,5 @@ The data is structured into raw, processed, and database layers:
 - `fact_transactions`: Granular investor transactions (SIPs/Lumpsums).
 - `portfolio_holdings`: Sector and asset allocation details.
 - `monthly_sip_inflows`: Aggregate system-level inflows.
+
+Final: Complete Bluestock MF Capstone
